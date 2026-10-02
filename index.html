@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="sv">
-
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,11 +9,10 @@
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+<style>
 
-<;
-    padding:0;
+html,body{
+    margin:0;
     height:100%;
     font-family:Arial,sans-serif;
 }
@@ -27,213 +25,302 @@ href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-mach
     position:absolute;
     top:15px;
     left:15px;
-
     z-index:1000;
 
     background:white;
     padding:15px;
-
     border-radius:12px;
+
+    max-width:300px;
 
     box-shadow:0 4px 12px rgba(0,0,0,0.3);
 }
 
-.info h2{
-    margin:0;
+h2{
+    margin-top:0;
+}
+
+.place{
+    font-weight:bold;
+    color:darkgreen;
 }
 
 </style>
 
 </head>
-
 <body>
 
 <div class="info">
-    <h2>🔥 Bildningsfacklan till Västerberg</h2>
+
+<h2>🔥 Bildningsfacklan</h2>
+
+<div id="currentPlace"></div>
+
+<br>
+
+<div id="countdown"></div>
+
 </div>
 
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet-routing-machineleaflet-routing-machine.jsscript>
-
 <script>
-
-// Platser
 
 const stops = [
 
-{
-name:"🏛 Olympia",
-lat:37.638,
-lng:21.630
-},
+["🏛 Olympia",37.638,21.630],
 
-{
-name:"🏛 Aten",
-lat:37.9838,
-lng:23.7275
-},
+["🏛 Aten",37.9838,23.7275],
 
-{
-name:"🏛 Rom",
-lat:41.9028,
-lng:12.4964
-},
+["🏛 Rom",41.9028,12.4964],
 
-{
-name:"🎨 Florens",
-lat:43.7696,
-lng:11.2558
-},
+["🎨 Florens",43.7696,11.2558],
 
-{
-name:"📖 Wittenberg",
-lat:51.8661,
-lng:12.6483
-},
+["📖 Wittenberg",51.8661,12.6483],
 
-{
-name:"✍️ Weimar",
-lat:50.9795,
-lng:11.3235
-},
+["✍️ Weimar",50.9795,11.3235],
 
-{
-name:"💡 Paris",
-lat:48.8566,
-lng:2.3522
-},
+["💡 Paris",48.8566,2.3522],
 
-{
-name:"🤝 Genève",
-lat:46.2044,
-lng:6.1432
-},
+["🤝 Genève",46.2044,6.1432],
 
-{
-name:"🎓 Köpenhamn",
-lat:55.6761,
-lng:12.5683
-},
+["🎓 Köpenhamn",55.6761,12.5683],
 
-{
-name:"📚 Forsa folkhögskola",
-lat:61.730,
-lng:16.960
-},
+["📚 Forsa folkhögskola",61.730,16.960],
 
-{
-name:"📚 Bollnäs folkhögskola",
-lat:61.349,
-lng:16.394
-},
+["📚 Bollnäs folkhögskola",61.349,16.394],
 
-{
-name:"🏁 Västerbergs folkhögskola",
-lat:60.407,
-lng:16.259
-}
+["🏁 Västerbergs folkhögskola",60.407,16.259]
 
 ];
 
-// Skapa kartan
+// Datum
 
-var map = L.map('map');
+const startDate =
+new Date("2026-10-02T00:00:00");
 
-// Bakgrund
+const endDate =
+new Date("2027-03-17T00:00:00");
+
+const now = new Date();
+
+let progress =
+(now - startDate) /
+(endDate - startDate);
+
+progress =
+Math.max(0, Math.min(1, progress));
+
+
+// Karta
+
+const map =
+L.map('map');
 
 L.tileLayer(
 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-attribution:'&copy; OpenStreetMap'
+attribution:'© OpenStreetMap'
 }
 ).addTo(map);
 
+
 // Markörer
 
-stops.forEach(function(stop){
+stops.forEach(stop => {
 
-L.marker([stop.lat,stop.lng])
+L.marker([stop[1],stop[2]])
 .addTo(map)
-.bindPopup(stop.name);
+.bindPopup(stop[0]);
 
 });
 
-// Fackelikon
 
-const torchIcon = L.divIcon({
-html:'<div style="font-size:34px">🔥</div>',
+// Anpassa zoom
+
+const allPoints =
+stops.map(p => [p[1],p[2]]);
+
+map.fitBounds(allPoints);
+
+
+// Hur långt har vi kommit?
+
+const totalSegments =
+stops.length - 1;
+
+const currentSegment =
+Math.floor(progress * totalSegments);
+
+const segmentProgress =
+(progress * totalSegments)
+- currentSegment;
+
+
+// Grön del
+
+let passedPoints = [];
+
+for(let i=0;i<=currentSegment;i++){
+
+passedPoints.push(
+[
+stops[i][1],
+stops[i][2]
+]
+);
+
+}
+
+if(currentSegment < totalSegments){
+
+const start =
+stops[currentSegment];
+
+const end =
+stops[currentSegment+1];
+
+const lat =
+start[1] +
+(end[1]-start[1])
+*
+segmentProgress;
+
+const lng =
+start[2] +
+(end[2]-start[2])
+*
+segmentProgress;
+
+passedPoints.push([lat,lng]);
+
+// Fackla
+
+const torchIcon =
+L.divIcon({
+html:'<div style="font-size:38px">🔥</div>',
 className:'',
-iconSize:[34,34]
+iconSize:[38,38]
 });
-
-// Fackla i Olympia
 
 L.marker(
-[
-stops[0].lat,
-stops[0].lng
-],
+[lat,lng],
 {
 icon:torchIcon
 }
 ).addTo(map);
 
-// Waypoints
+}
 
-const waypoints = stops.map(stop =>
-L.latLng(stop.lat,stop.lng)
+
+// Avklarad sträcka
+
+L.polyline(
+passedPoints,
+{
+color:'green',
+weight:6
+}
+).addTo(map);
+
+
+// Kvarvarande sträcka
+
+let remaining = [];
+
+if(currentSegment < totalSegments){
+
+remaining.push(
+passedPoints[passedPoints.length-1]
 );
 
-// Routing
+for(
+let i=currentSegment+1;
+i<stops.length;
+i++
+){
 
-const routingControl =
-L.Routing.control({
+remaining.push(
+[
+stops[i][1],
+stops[i][2]
+]
+);
 
-waypoints: waypoints,
+}
 
-show:false,
-
-addWaypoints:false,
-
-routeWhileDragging:false,
-
-draggableWaypoints:false,
-
-fitSelectedRoutes:true,
-
-lineOptions:{
-styles:[
+L.polyline(
+remaining,
 {
 color:'red',
-weight:5,
-opacity:0.8
+weight:4,
+dashArray:'10,10'
 }
-]
-},
+).addTo(map);
 
-createMarker:function(){
-return null;
 }
 
-}).addTo(map);
 
-// Dölj instruktioner
+// Aktuell plats
 
-setTimeout(function(){
+document.getElementById(
+"currentPlace"
+).innerHTML =
 
-const container =
-document.querySelector(
-'.leaflet-routing-container'
+'📍 Aktuell etapp:<br><span class="place">' +
+
+stops[
+Math.min(
+currentSegment,
+stops.length-1
+)
+][0]
+
++
+
+'</span>';
+
+
+// Nedräkning
+
+function updateCountdown(){
+
+const now =
+new Date();
+
+const diff =
+endDate - now;
+
+const days =
+Math.floor(
+diff/(1000*60*60*24)
 );
 
-if(container){
-container.style.display='none';
+const hours =
+Math.floor(
+(diff/(1000*60*60))%24
+);
+
+document.getElementById(
+"countdown"
+).innerHTML =
+
+'⏳ ' +
+days +
+' dagar ' +
+hours +
+' timmar kvar';
+
 }
 
-},1000);
+updateCountdown();
+
+setInterval(
+updateCountdown,
+1000
+);
 
 </script>
 
