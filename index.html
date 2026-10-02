@@ -26,18 +26,68 @@ html, body {
 
 <script>
 
-var map = L.map('map').setView([60.407,16.259], 6);
+const stops = [
+    {name:"🏛 Olympia", lat:37.638, lng:21.630},
+    {name:"🏛 Aten", lat:37.9838, lng:23.7275},
+    {name:"📚 Alexandria", lat:31.2001, lng:29.9187},
+    {name:"🏛 Rom", lat:41.9028, lng:12.4964},
+    {name:"🎨 Florens", lat:43.7696, lng:11.2558},
+    {name:"📖 Wittenberg", lat:51.8661, lng:12.6483},
+    {name:"✍️ Weimar", lat:50.9795, lng:11.3235},
+    {name:"💡 Paris", lat:48.8566, lng:2.3522},
+    {name:"🤝 Genève", lat:46.2044, lng:6.1432},
+    {name:"🎓 Köpenhamn", lat:55.6761, lng:12.5683},
+    {name:"📚 Forsa folkhögskola", lat:61.730, lng:16.960},
+    {name:"📚 Bollnäs folkhögskola", lat:61.349, lng:16.394},
+    {name:"🏁 Västerbergs folkhögskola", lat:60.407, lng:16.259}
+];
 
+// Skapa karta
+var map = L.map('map');
+
+// Bakgrundskarta
 L.tileLayer(
 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
-attribution: '&copy; OpenStreetMap'
+ attribution:'&copy; OpenStreetMap'
 }
 ).addTo(map);
 
-L.marker([60.407,16.259])
-.addTo(map)
-.bindPopup('Västerberg');
+// Markörer
+stops.forEach(function(stop){
+    L.marker([stop.lat, stop.lng])
+        .addTo(map)
+        .bindPopup(stop.name);
+});
+
+// Koordinater till rutten
+const routeCoordinates = stops.map(
+    stop => [stop.lat, stop.lng]
+);
+
+// Rita rutten
+const route = L.polyline(
+    routeCoordinates,
+    {
+        color: 'red',
+        weight: 4
+    }
+).addTo(map);
+
+// Anpassa zoom
+map.fitBounds(route.getBounds());
+
+// Fackla vid start
+const torchIcon = L.divIcon({
+    html:'<div style="font-size:32px">🔥</div>',
+    className:'',
+    iconSize:[32,32]
+});
+
+L.marker(
+    [stops[0].lat, stops[0].lng],
+    {icon:torchIcon}
+).addTo(map);
 
 </script>
 
