@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/distwser.min.jsscript>
+
 <title>Folkbildningsfacklan till Västerberg</title>
 
 <link rel="stylesheet"
@@ -45,13 +45,6 @@ h2{
     color:darkgreen;
 }
 
-#celebration{
-    margin-top:15px;
-    text-align:center;
-    color:#d35400;
-    font-weight:bold;
-}
-
 </style>
 
 </head>
@@ -59,7 +52,7 @@ h2{
 
 <div class="info">
 
-<h2>Folkbildningsfacklan 🔥</h2>
+<h2>🔥 Folkbildningsfacklan</h2>
 
 <div id="currentPlace"></div>
 
@@ -78,8 +71,6 @@ h2{
 <br>
 
 <div id="countdown"></div>
-
-<div id="celebration"></div>
 
 </div>
 
@@ -172,7 +163,7 @@ info:"En plats där människor från olika bakgrunder möts för bildning och ut
 name:"🏁 Västerbergs folkhögskola",
 lat:60.407,
 lng:16.259,
-info:"Målet för bildningsfacklan och platsen där Lilla OS genomförs."
+info:"Målet för folkbildningsfacklan och platsen där Lilla OS genomförs."
 }
 
 ];
@@ -221,46 +212,16 @@ const totalSegments =
 stops.length - 1;
 
 const currentSegment =
-progress >= 1
-? totalSegments
-: Math.floor(progress * totalSegments);
-
-let passedPoints = [];
-
-if(progress >= 1){
-
-stops.forEach(stop => {
-
-passedPoints.push([
-stop.lat,
-stop.lng
-]);
-
-});
-
-const torchIcon =
-L.divIcon({
-html:'<div style="font-size:38px">🔥</div>',
-className:'',
-iconSize:[38,38]
-});
-
-L.marker(
-[
-stops[stops.length-1].lat,
-stops[stops.length-1].lng
-],
-{
-icon:torchIcon
-}
-).addTo(map);
-
-}
-else{
+Math.min(
+Math.floor(progress * totalSegments),
+totalSegments - 1
+);
 
 const segmentProgress =
 (progress * totalSegments)
 - currentSegment;
+
+let passedPoints = [];
 
 for(let i=0;i<=currentSegment;i++){
 
@@ -309,13 +270,10 @@ icon:torchIcon
 ).addTo(map);
 
 L.polyline(
-[
-[start.lat,start.lng],
-[torchLat,torchLng]
-],
+passedPoints,
 {
-color:'gold',
-weight:8
+color:'green',
+weight:6
 }
 ).addTo(map);
 
@@ -348,16 +306,6 @@ dashArray:'10,10'
 }
 ).addTo(map);
 
-}
-
-L.polyline(
-passedPoints,
-{
-color:'green',
-weight:6
-}
-).addTo(map);
-
 document.getElementById(
 "currentPlace"
 ).innerHTML =
@@ -365,26 +313,12 @@ document.getElementById(
 "<b>📍 Senast passerad plats</b><br>" +
 stops[currentSegment].name;
 
-if(progress < 1){
-
 document.getElementById(
 "nextPlace"
 ).innerHTML =
 
 "<b>🏃 På väg mot</b><br>" +
 stops[currentSegment+1].name;
-
-}
-else{
-
-document.getElementById(
-"nextPlace"
-).innerHTML =
-
-"<b>🏁 Målgång</b><br>" +
-"Västerbergs folkhögskola";
-
-}
 
 document.getElementById(
 "progress"
@@ -400,19 +334,6 @@ document.getElementById(
 
 stops[currentSegment].info;
 
-    const distanceToNext =
-Math.round(
-(1-segmentProgress) * 100
-);
-
-document.getElementById(
-"placeInfo"
-).innerHTML +=
-
-"<br><br><b>Etappen är ungefär " +
-distanceToNext +
-"% kvar.</b>";
-    
 function updateCountdown(){
 
 const now =
@@ -420,17 +341,6 @@ new Date();
 
 const diff =
 endDate - now;
-
-if(diff <= 0){
-
-document.getElementById(
-"countdown"
-).innerHTML =
-
-"🏁 Bildningsfacklan har nått Västerberg";
-
-return;
-}
 
 const days =
 Math.floor(
@@ -460,39 +370,6 @@ setInterval(
 updateCountdown,
 1000
 );
-
-const nowTime =
-new Date();
-
-const celebrationStart =
-new Date("2027-03-17T08:00:00+01:00");
-
-const celebrationEnd =
-new Date("2027-03-17T16:00:00+01:00");
-
-if(
-nowTime >= celebrationStart &&
-nowTime <= celebrationEnd
-){
-
-document.getElementById(
-"celebration"
-).innerHTML =
-
-"🎆 Folkbildningsfacklan har nått Västerberg!";
-
-setInterval(() => {
-
-confetti({
-    particleCount:100,
-    spread:70,
-    origin:{y:0.6}
-});
-
-},3000);
-
-}
-
 
 </script>
 
