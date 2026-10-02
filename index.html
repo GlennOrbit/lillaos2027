@@ -31,7 +31,7 @@ html,body{
     padding:15px;
     border-radius:12px;
 
-    max-width:300px;
+    max-width:320px;
 
     box-shadow:0 4px 12px rgba(0,0,0,0.3);
 }
@@ -43,6 +43,13 @@ h2{
 .place{
     font-weight:bold;
     color:darkgreen;
+}
+
+#celebration{
+    margin-top:15px;
+    text-align:center;
+    color:#d35400;
+    font-weight:bold;
 }
 
 </style>
@@ -58,7 +65,21 @@ h2{
 
 <br>
 
+<div id="nextPlace"></div>
+
+<br>
+
+<div id="progress"></div>
+
+<br>
+
+<div id="placeInfo"></div>
+
+<br>
+
 <div id="countdown"></div>
+
+<div id="celebration"></div>
 
 </div>
 
@@ -70,39 +91,97 @@ h2{
 
 const stops = [
 
-["🏛 Olympia",37.638,21.630],
+{
+name:"🏛 Olympia",
+lat:37.638,
+lng:21.630,
+info:"Den olympiska elden tänds här. Olympia symboliserar människans strävan efter utveckling, gemenskap och fredlig tävlan."
+},
 
-["🏛 Aten",37.9838,23.7275],
+{
+name:"🏛 Aten",
+lat:37.9838,
+lng:23.7275,
+info:"Här föddes demokratin och här verkade Sokrates, Platon och Aristoteles."
+},
 
-["🏛 Rom",41.9028,12.4964],
+{
+name:"🏛 Rom",
+lat:41.9028,
+lng:12.4964,
+info:"Rom formade lagar, statsförvaltning och idéer som fortfarande påverkar Europa."
+},
 
-["🎨 Florens",43.7696,11.2558],
+{
+name:"🎨 Florens",
+lat:43.7696,
+lng:11.2558,
+info:"Renässansens centrum där konst, vetenskap och humanism blomstrade."
+},
 
-["📖 Wittenberg",51.8661,12.6483],
+{
+name:"📖 Wittenberg",
+lat:51.8661,
+lng:12.6483,
+info:"Här verkade Martin Luther. Reformationen bidrog till ökad läskunnighet och ett nytt synsätt på individen."
+},
 
-["✍️ Weimar",50.9795,11.3235],
+{
+name:"✍️ Weimar",
+lat:50.9795,
+lng:11.3235,
+info:"Goethe och Schiller gjorde Weimar till ett centrum för europeisk kultur och bildning."
+},
 
-["💡 Paris",48.8566,2.3522],
+{
+name:"💡 Paris",
+lat:48.8566,
+lng:2.3522,
+info:"Upplysningens idéer om frihet, jämlikhet och vetenskap spreds härifrån."
+},
 
-["🤝 Genève",46.2044,6.1432],
+{
+name:"🤝 Genève",
+lat:46.2044,
+lng:6.1432,
+info:"En stad för internationellt samarbete, mänskliga rättigheter och diplomati."
+},
 
-["🎓 Köpenhamn",55.6761,12.5683],
+{
+name:"🎓 Köpenhamn",
+lat:55.6761,
+lng:12.5683,
+info:"Grundtvigs idéer lade grunden för den nordiska folkhögskolan."
+},
 
-["📚 Forsa folkhögskola",61.730,16.960],
+{
+name:"📚 Forsa folkhögskola",
+lat:61.730,
+lng:16.960,
+info:"En av Sveriges äldsta folkhögskolor och en viktig del av svensk folkbildning."
+},
 
-["📚 Bollnäs folkhögskola",61.349,16.394],
+{
+name:"📚 Bollnäs folkhögskola",
+lat:61.349,
+lng:16.394,
+info:"En plats där människor från olika bakgrunder möts för bildning och utveckling."
+},
 
-["🏁 Västerbergs folkhögskola",60.407,16.259]
+{
+name:"🏁 Västerbergs folkhögskola",
+lat:60.407,
+lng:16.259,
+info:"Målet för bildningsfacklan och platsen där Lilla OS genomförs."
+}
 
 ];
-
-// Datum
 
 const startDate =
 new Date("2026-10-02T00:00:00");
 
 const endDate =
-new Date("2027-03-17T00:00:00");
+new Date("2027-03-17T08:00:00");
 
 const now = new Date();
 
@@ -112,9 +191,6 @@ let progress =
 
 progress =
 Math.max(0, Math.min(1, progress));
-
-
-// Karta
 
 const map =
 L.map('map');
@@ -126,77 +202,41 @@ attribution:'© OpenStreetMap'
 }
 ).addTo(map);
 
-
-// Markörer
-
 stops.forEach(stop => {
 
-L.marker([stop[1],stop[2]])
+L.marker([stop.lat,stop.lng])
 .addTo(map)
-.bindPopup(stop[0]);
+.bindPopup(
+"<b>" + stop.name + "</b><br><br>" + stop.info
+);
 
 });
 
-
-// Anpassa zoom
-
 const allPoints =
-stops.map(p => [p[1],p[2]]);
+stops.map(p => [p.lat,p.lng]);
 
 map.fitBounds(allPoints);
-
-
-// Hur långt har vi kommit?
 
 const totalSegments =
 stops.length - 1;
 
 const currentSegment =
-Math.floor(progress * totalSegments);
-
-const segmentProgress =
-(progress * totalSegments)
-- currentSegment;
-
-
-// Grön del
+progress >= 1
+? totalSegments
+: Math.floor(progress * totalSegments);
 
 let passedPoints = [];
 
-for(let i=0;i<=currentSegment;i++){
+if(progress >= 1){
 
-passedPoints.push(
-[
-stops[i][1],
-stops[i][2]
-]
-);
+stops.forEach(stop => {
 
-}
+passedPoints.push([
+stop.lat,
+stop.lng
+]);
 
-if(currentSegment < totalSegments){
-
-const start =
-stops[currentSegment];
-
-const end =
-stops[currentSegment+1];
-
-const lat =
-start[1] +
-(end[1]-start[1])
-*
-segmentProgress;
-
-const lng =
-start[2] +
-(end[2]-start[2])
-*
-segmentProgress;
-
-passedPoints.push([lat,lng]);
-
-// Fackla
+});
 
 const torchIcon =
 L.divIcon({
@@ -206,35 +246,85 @@ iconSize:[38,38]
 });
 
 L.marker(
-[lat,lng],
+[
+stops[stops.length-1].lat,
+stops[stops.length-1].lng
+],
 {
 icon:torchIcon
 }
 ).addTo(map);
 
 }
+else{
 
+const segmentProgress =
+(progress * totalSegments)
+- currentSegment;
 
-// Avklarad sträcka
+for(let i=0;i<=currentSegment;i++){
 
-L.polyline(
-passedPoints,
+passedPoints.push([
+stops[i].lat,
+stops[i].lng
+]);
+
+}
+
+const start =
+stops[currentSegment];
+
+const end =
+stops[currentSegment+1];
+
+const torchLat =
+start.lat +
+(end.lat-start.lat)
+*
+segmentProgress;
+
+const torchLng =
+start.lng +
+(end.lng-start.lng)
+*
+segmentProgress;
+
+passedPoints.push([
+torchLat,
+torchLng
+]);
+
+const torchIcon =
+L.divIcon({
+html:'<div style="font-size:38px">🔥</div>',
+className:'',
+iconSize:[38,38]
+});
+
+L.marker(
+[torchLat,torchLng],
 {
-color:'green',
-weight:6
+icon:torchIcon
 }
 ).addTo(map);
 
-
-// Kvarvarande sträcka
+L.polyline(
+[
+[start.lat,start.lng],
+[torchLat,torchLng]
+],
+{
+color:'gold',
+weight:8
+}
+).addTo(map);
 
 let remaining = [];
 
-if(currentSegment < totalSegments){
-
-remaining.push(
-passedPoints[passedPoints.length-1]
-);
+remaining.push([
+torchLat,
+torchLng
+]);
 
 for(
 let i=currentSegment+1;
@@ -242,12 +332,10 @@ i<stops.length;
 i++
 ){
 
-remaining.push(
-[
-stops[i][1],
-stops[i][2]
-]
-);
+remaining.push([
+stops[i].lat,
+stops[i].lng
+]);
 
 }
 
@@ -262,28 +350,55 @@ dashArray:'10,10'
 
 }
 
-
-// Aktuell plats
+L.polyline(
+passedPoints,
+{
+color:'green',
+weight:6
+}
+).addTo(map);
 
 document.getElementById(
 "currentPlace"
 ).innerHTML =
 
-'📍 Aktuell etapp:<br><span class="place">' +
+"<b>📍 Senast passerad plats</b><br>" +
+stops[currentSegment].name;
 
-stops[
-Math.min(
-currentSegment,
-stops.length-1
-)
-][0]
+if(progress < 1){
 
-+
+document.getElementById(
+"nextPlace"
+).innerHTML =
 
-'</span>';
+"<b>🏃 På väg mot</b><br>" +
+stops[currentSegment+1].name;
 
+}
+else{
 
-// Nedräkning
+document.getElementById(
+"nextPlace"
+).innerHTML =
+
+"<b>🏁 Målgång</b><br>" +
+"Västerbergs folkhögskola";
+
+}
+
+document.getElementById(
+"progress"
+).innerHTML =
+
+"<b>📊 " +
+Math.round(progress*100) +
+"% av resan avklarad</b>";
+
+document.getElementById(
+"placeInfo"
+).innerHTML =
+
+stops[currentSegment].info;
 
 function updateCountdown(){
 
@@ -292,6 +407,17 @@ new Date();
 
 const diff =
 endDate - now;
+
+if(diff <= 0){
+
+document.getElementById(
+"countdown"
+).innerHTML =
+
+"🏁 Bildningsfacklan har nått Västerberg";
+
+return;
+}
 
 const days =
 Math.floor(
@@ -307,11 +433,11 @@ document.getElementById(
 "countdown"
 ).innerHTML =
 
-'⏳ ' +
+"⏳ " +
 days +
-' dagar ' +
+" dagar " +
 hours +
-' timmar kvar';
+" timmar kvar";
 
 }
 
@@ -321,6 +447,31 @@ setInterval(
 updateCountdown,
 1000
 );
+
+const nowTime =
+new Date();
+
+const celebrationStart =
+new Date("2027-03-17T08:00:00+01:00");
+
+const celebrationEnd =
+new Date("2027-03-17T16:00:00+01:00");
+
+if(
+nowTime >= celebrationStart &&
+nowTime <= celebrationEnd
+){
+
+document.getElementById(
+"celebration"
+).innerHTML =
+
+"🎆🎆🎆<br>" +
+"Bildningsfacklan har nått Västerberg!<br>" +
+"Lilla OS är invigt!";
+
+}
+
 
 </script>
 
