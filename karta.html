@@ -382,43 +382,53 @@ document.getElementById(
 ).innerHTML =
  
 stops[currentSegment].info;
- 
+
+
+    
 }
- 
+
+function updateCountdown() {
+
+    const now = new Date();
+
+    const diff = endDate - now;
+
+    if (diff <= 0) {
+        document.getElementById("countdown").innerHTML =
+        "🏁 Folkbildningsfacklan har nått målet!";
+        return;
+    }
+
+    const days =
+    Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const hours =
+    Math.floor((diff / (1000 * 60 * 60)) % 24);
+
+    const minutes =
+    Math.floor((diff / (1000 * 60)) % 60);
+
+    const seconds =
+    Math.floor((diff / 1000) % 60);
+
+    document.getElementById("countdown").innerHTML =
+    "⏳ " +
+    days +
+    " dagar " +
+    hours +
+    " timmar " +
+    minutes +
+    " minuter " +
+    seconds +
+    " sekunder kvar";
+}
+    
 updateTorch();
  
 setInterval(
 updateTorch,
 1000 * 60 * 30
 );
-
-const now =
-new Date();
-
-const diff =
-endDate - now;
-
-const days =
-Math.floor(
-diff/(1000*60*60*24)
-);
-
-const hours =
-Math.floor(
-(diff/(1000*60*60))%24
-);
-
-document.getElementById(
-"countdown"
-).innerHTML =
-
-"⏳ " +
-days +
-" dagar " +
-hours +
-" timmar kvar";
-
-}
 
 updateCountdown();
 
