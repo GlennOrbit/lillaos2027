@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Bildningsfacklan till Västerberg</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/distwser.min.jsscript>
+<title>Folkbildningsfacklan till Västerberg</title>
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -59,7 +59,7 @@ h2{
 
 <div class="info">
 
-<h2>🔥 Bildningsfacklan</h2>
+<h2>Folkbildningsfacklan 🔥</h2>
 
 <div id="currentPlace"></div>
 
@@ -400,6 +400,19 @@ document.getElementById(
 
 stops[currentSegment].info;
 
+    const distanceToNext =
+Math.round(
+(1-segmentProgress) * 100
+);
+
+document.getElementById(
+"placeInfo"
+).innerHTML +=
+
+"<br><br><b>Etappen är ungefär " +
+distanceToNext +
+"% kvar.</b>";
+    
 function updateCountdown(){
 
 const now =
@@ -466,9 +479,17 @@ document.getElementById(
 "celebration"
 ).innerHTML =
 
-"🎆🎆🎆<br>" +
-"Bildningsfacklan har nått Västerberg!<br>" +
-"Lilla OS är invigt!";
+"🎆 Folkbildningsfacklan har nått Västerberg!";
+
+setInterval(() => {
+
+confetti({
+    particleCount:100,
+    spread:70,
+    origin:{y:0.6}
+});
+
+},3000);
 
 }
 
