@@ -486,38 +486,40 @@ updateCountdown,
 1000
 );
 
-const dailyLearning = [
+fetch("data/folkbildning.json")
+.then(response => response.json())
+.then(data => {
 
-{
-title:"Sokrates",
-subtitle:"Grekisk filosof (470–399 f.Kr.)",
-content:"'Det enda jag vet är att jag inget vet.'",
-description:"Sokrates anses vara en av den västerländska filosofins grundare. Han undervisade genom att ställa frågor snarare än att ge svar."
-},
+    const currentWeek =
+    Math.floor(
+        (new Date() - startDate) /
+        (1000 * 60 * 60 * 24 * 7)
+    ) + 1;
 
-{
-title:"🏛 Demokratin i Aten",
-subtitle:"Världens första demokrati",
-content:"Många av våra demokratiska idéer har sina rötter i Aten.",
-description:"I Aten samlades medborgarna för att rösta direkt om lagar och viktiga beslut."
-},
+    const item =
+    data.find(
+        x => x.vecka === currentWeek
+    ) || data[0];
 
-{
-title:"🧮 Pythagoras",
-subtitle:"Matematiker",
-content:"a² + b² = c²",
-description:"Pythagoras sats används än idag inom matematik, byggnation och teknik."
-},
+    document.getElementById(
+        "dailyLearning"
+    ).innerHTML =
 
-{
-title:"🎭 Antik teater",
-subtitle:"Grekisk kultur",
-content:"Många av våra moderna teaterformer har sitt ursprung i Grekland.",
-description:"De stora tragedierna och komedierna spelades inför tusentals åskådare."
-}
+    "<h3>📖 Veckans folkbildning</h3>" +
 
-];
-const dayNumber =
+    "<h4>" +
+    item.titel +
+    "</h4>" +
+
+    "<p>" +
+    item.kortText +
+    "</p>" +
+
+    "<a href='" +
+    item.lasMerUrl +
+    "'>";
+
+});const dayNumber =
 Math.floor(
 (new Date() - startDate) /
 (1000 * 60 * 60 * 24)
