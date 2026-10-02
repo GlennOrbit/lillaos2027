@@ -72,6 +72,10 @@ h2{
 
 <div id="countdown"></div>
 
+<br>
+
+<div id="dailyLearning"></div>
+    
 </div>
 
 <div id="map"></div>
@@ -371,6 +375,70 @@ updateCountdown,
 1000
 );
 
+const dailyLearning = [
+
+{
+title:"📖 Dagens dikt",
+content:"'Det enda jag vet är att jag inget vet.' – Sokrates"
+},
+
+{
+title:"🧮 Dagens kluring",
+content:"Hur många handslag blir det om 10 personer hälsar på varandra exakt en gång?"
+},
+
+{
+title:"🎨 Dagens konst",
+content:"Studera Van Goghs målning Stjärnenatt. Vad tror du konstnären vill förmedla?"
+},
+
+{
+title:"🎵 Dagens musik",
+content:"Lyssna på inledningen av Beethovens femte symfoni. Kan du känna igen den?"
+},
+
+{
+title:"🌍 Dagens geografi",
+content:"Timbuktu var under medeltiden ett av världens viktigaste centra för lärande."
+},
+
+{
+title:"📚 Dagens folkbildning",
+content:"Folkhögskolan bygger på frivilligt lärande där deltagaren själv är aktiv i sin kunskapsutveckling."
+},
+
+{
+title:"💭 Dagens filosofi",
+content:"Är det möjligt att veta att något är sant?"
+}
+
+];
+
+const dayNumber =
+Math.floor(
+(new Date() - startDate) /
+(1000 * 60 * 60 * 24)
+);
+
+const todaysItem =
+dailyLearning[
+dayNumber % dailyLearning.length
+];
+
+document.getElementById(
+"dailyLearning"
+).innerHTML =
+
+"<hr>" +
+
+"<h3>" +
+todaysItem.title +
+"</h3>" +
+
+"<p>" +
+todaysItem.content +
+"</p>";
+    
 </script>
 
 </body>
