@@ -3,125 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lilla OS 2027</title>
+
+<title>Facklan till Västerberg</title>
+
+<link rel="stylesheet"
+href="https://leaflet.css
 
 <style>
+
 body{
     margin:0;
-    font-family:Arial, sans-serif;
-
-    background-image:
-        linear-gradient(
-            rgba(0,0,0,0.4),
-            rgba(0,0,0,0.4)
-        ),
-        url("ringar.png");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    text-align:center;
+    font-family:Arial,sans-serif;
 }
 
-    .container{
-        padding:40px;
-        border-radius:20px;
-        background:rgba(255,255,255,0.1);
-        backdrop-filter:blur(10px);
-        box-shadow:0 8px 30px rgba(0,0,0,0.3);
-    }
+#map{
+    height:100vh;
+    width:100%;
+}
 
-    h1{
-        margin-bottom:30px;
-        font-size:2.5rem;
-    }
+.info{
+    position:absolute;
+    top:15px;
+    left:15px;
 
-    #countdown{
-        display:flex;
-        flex-wrap:wrap;
-        justify-content:center;
-        gap:20px;
-    }
+    z-index:1000;
 
-    .time-box{
-        background:rgba(255,255,255,0.15);
-        padding:20px;
-        min-width:100px;
-        border-radius:12px;
-    }
+    background:white;
+    padding:15px;
+    border-radius:10px;
 
-    .number{
-        font-size:3rem;
-        font-weight:bold;
-    }
+    box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
 
-    .label{
-        font-size:1rem;
-        margin-top:5px;
-    }
+.info h2{
+    margin-top:0;
+}
+
 </style>
+
 </head>
 <body>
 
-<div class="container">
-    <h1>Lilla OS 2027</h1>
-
-    <div id="countdown">
-        <div class="time-box">
-            <div class="number" id="days">0</div>
-            <div class="label">Dagar</div>
-        </div>
-
-        <div class="time-box">
-            <div class="number" id="hours">0</div>
-            <div class="label">Timmar</div>
-        </div>
-
-        <div class="time-box">
-            <div class="number" id="minutes">0</div>
-            <div class="label">Minuter</div>
-        </div>
-
-        <div class="time-box">
-            <div class="number" id="seconds">0</div>
-            <div class="label">Sekunder</div>
-        </div>
-    </div>
+<div class="info">
+    <h2>🔥 Facklan till Västerberg</h2>
+    <div id="countdown"></div>
 </div>
 
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/distript>
+
 <script>
-const targetDate = new Date("2027-03-17T00:00:00");
 
-function updateCountdown() {
-    const now = new Date();
-    const diff = targetDate - now;
+// Olympia
+const start = [37.638, 21.630];
 
-    if (diff <= 0) {
-        document.querySelector(".container").innerHTML =
-            "<h1>🎉 Dagen är här! 🎉</h1>";
-        return;
-    }
+// Västerbergs folkhögskola
+const end = [60.407, 16.259];
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+// Skapa karta
+const map = L.map('map').setView([52,15], 5);
 
-    document.getElementById("days").textContent = days;
-    document.getElementById("hours").textContent = hours;
-    document.getElementById("minutes").textContent = minutes;
-    document.getElementById("seconds").textContent = seconds;
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+ maxZoom: 18
+}).addTo(map);
+
+// Markörer
+L.marker(start)
+.addTo(map)
+.bindPopup("🏛 Olympia");
+
+L.marker(end)
+.addTo(map)
+.bindPopup("🏁 Västerbergs folkhögskola");
+
+// Ruttlinje
+const route = L.polyline(
+[start,end],
+{
+color:'red',
+weight:4
+}
+).addTo(map);
+
+map.fitBounds(route.getBounds());
+
+// Datum
+const journeyStart = new Date("2026-10-02");
+const journeyEnd   = new Date("2027-03-17");
+
+// Hur långt har facklan kommit?
+const now = new Date();
+
+let progress =
+(now - journeyStart) /
+(journeyEnd - journeyStart);
+
+progress = Math.max(0, Math.min(1, progress));
+
+// Beräkna position
+const lat =
+start[0] + (end[0]-start[0]) * progress;
+
+const lng =
+start[1] + (end[1]-start[1]) * progress;
+
+// Fackla
+const torchIcon = L.divIcon({
+    html:"🔥",
+    className:"",
+    iconSize:[30,30]
+});
+
+L.marker([lat,lng], {
+icon: torchIcon
+}).addTo(map);
+
+// Nedräkning
+
+function updateCountdown(){
+
+const target =
+new Date("2027-03-17T00:00:00");
+
+const now = new Date();
+
+const diff = target - now;
+
+const days =
+Math.floor(diff/(1000*60*60*24));
+
+const hours =
+Math.floor((diff/(1000*60*60))%24);
+
+const minutes =
+Math.floor((diff/(1000*60))%60);
+
+document.getElementById("countdown")
+.innerHTML =
+"<strong>"+days+
+"</strong> dagar "+
+hours+
+" timmar "+
+minutes+
+" minuter kvar";
+
 }
 
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(updateCountdown,1000);
+
 </script>
 
 </body>
