@@ -38,7 +38,7 @@ html,body{
     padding:15px;
     border-radius:12px;
 
-    max-width:320px;
+    width:320px;
 
     box-shadow:0 4px 12px rgba(0,0,0,0.3);
 }
@@ -63,6 +63,41 @@ h2{
     color:darkgreen;
 }
 
+.info,
+.learning-box{
+    width:320px;
+    box-sizing:border-box;
+}
+
+.learning-box h3{
+    margin-top:0;
+    margin-bottom:10px;
+}
+
+.learning-box h4{
+    margin-top:0;
+    margin-bottom:10px;
+}
+
+@media (max-width: 600px){
+
+    .panel-container{
+        top:10px;
+        left:10px;
+        right:10px;
+    }
+
+    .info,
+    .learning-box{
+        width:calc(100vw - 20px);
+        max-width:none;
+    }
+
+    h2{
+        font-size:1.8rem;
+    }
+}
+
 </style>
 
 </head>
@@ -76,14 +111,13 @@ h2{
 <h2>🔥 Folkbildningsfacklan</h2>
 
 <div id="countdown"></div>
-    <br>
-<div id="currentPlace"></div>
 
 <br>
 
 <div id="nextPlace"></div>
 
-
+<br>
+    
 <div id="placeInfo"></div>
     
 <br>
@@ -378,13 +412,6 @@ dashArray:'10,10'
 ).addTo(map);
  
 document.getElementById(
-"currentPlace"
-).innerHTML =
- 
-"<b>📍 Senast passerad plats</b><br>" +
-stops[currentSegment].name;
- 
-document.getElementById(
 "nextPlace"
 ).innerHTML =
  
@@ -462,7 +489,7 @@ updateCountdown,
 const dailyLearning = [
 
 {
-title:"📖 Sokrates",
+title:"Sokrates",
 subtitle:"Grekisk filosof (470–399 f.Kr.)",
 content:"'Det enda jag vet är att jag inget vet.'",
 description:"Sokrates anses vara en av den västerländska filosofins grundare. Han undervisade genom att ställa frågor snarare än att ge svar."
@@ -505,11 +532,11 @@ document.getElementById(
 "dailyLearning"
 ).innerHTML =
 
-"<hr>" +
+"<h3>📖 Veckans folkbildning</h3>" +
 
-"<h3>" +
+"<h4>" +
 todaysItem.title +
-"</h3>" +
+"</h4>" +
 
 "<p>" +
 todaysItem.content +
