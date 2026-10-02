@@ -212,67 +212,131 @@ stops.map(p => [p.lat,p.lng]);
 
 map.fitBounds(allPoints);
 
-const totalSegments =
-stops.length - 1;
-
-const currentSegment =
-Math.min(
-Math.floor(progress * totalSegments),
-totalSegments - 1
-);
-
-const segmentProgress =
-(progress * totalSegments)
-- currentSegment;
-
-let passedPoints = [];
-
-for(let i=0;i<=currentSegment;i++){
-
-passedPoints.push([
-stops[i].lat,
-stops[i].lng
-]);
-
-}
-
-const start =
-stops[currentSegment];
-
-const end =
-stops[currentSegment+1];
-
-const torchLat =
-start.lat +
-(end.lat-start.lat)
-*
-segmentProgress;
-
-const torchLng =
-start.lng +
-(end.lng-start.lng)
-*
-segmentProgress;
-
-passedPoints.push([
-torchLat,
-torchLng
-]);
-
+let torchMarker;
+let passedLine;
+let remainingLine;
+ 
 const torchIcon =
 L.divIcon({
 html:'<div style="font-size:38px">🔥</div>',
 className:'',
 iconSize:[38,38]
 });
-
+ 
+function updateTorch(){
+ 
+const now = new Date();
+ 
+let progress =
+(now - startDate) /
+(endDate - startDate);
+ 
+progress =
+Math.max(0, Math.min(1, progress));
+ 
+const totalSegments =
+stops.length - 1;
+ 
+const currentSegment =
+Math.min(
+Math.floor(progress * totalSegments),
+totalSegments - 1
+);
+ 
+const segmentProgress =
+(progress * totalSegments)
+- currentSegment;
+ 
+let passedPoints = [];
+ 
+for(let i=0;i<=currentSegment;i++){
+ 
+passedPoints.push([
+stops[i].lat,
+stops[i].lng
+]);
+ 
+}
+ 
+const start =
+stops[currentSegment];
+ 
+const end =
+stops[currentSegment + 1];
+ 
+const torchLat =
+start.lat +
+(end.lat-start.lat)
+*
+segmentProgress;
+ 
+const torchLng =
+start.lng +
+(end.lng-start.lng)
+*
+segmentProgress;
+ 
+passedPoints.push([
+torchLat,
+torchLng
+]);
+ 
+let remaining = [];
+ 
+remaining.push([
+torchLat,
+torchLng
+]);
+ 
+for(
+let i=currentSegment+1;
+i<stops.length;
+i++
+){
+ 
+remaining.push([
+stops[i].lat,
+stops[i].lng
+]);
+ 
+}
+ 
+if(!torchMarker){
+ 
+torchMarker =
 L.marker(
 [torchLat,torchLng],
 {
 icon:torchIcon
 }
 ).addTo(map);
-
+ 
+}else{
+ 
+torchMarker.setLatLng([
+torchLat,
+torchLng
+]);
+ 
+}
+ 
+if(passedLine){
+ 
+map.removeLayer(
+passedLine
+);
+ 
+}
+ 
+if(remainingLine){
+ 
+map.removeLayer(
+remainingLine
+);
+ 
+}
+ 
+passedLine =
 L.polyline(
 passedPoints,
 {
@@ -280,27 +344,8 @@ color:'green',
 weight:6
 }
 ).addTo(map);
-
-let remaining = [];
-
-remaining.push([
-torchLat,
-torchLng
-]);
-
-for(
-let i=currentSegment+1;
-i<stops.length;
-i++
-){
-
-remaining.push([
-stops[i].lat,
-stops[i].lng
-]);
-
-}
-
+ 
+remainingLine =
 L.polyline(
 remaining,
 {
@@ -309,36 +354,43 @@ weight:4,
 dashArray:'10,10'
 }
 ).addTo(map);
-
+ 
 document.getElementById(
 "currentPlace"
 ).innerHTML =
-
+ 
 "<b>📍 Senast passerad plats</b><br>" +
 stops[currentSegment].name;
-
+ 
 document.getElementById(
 "nextPlace"
 ).innerHTML =
-
+ 
 "<b>🏃 På väg mot</b><br>" +
-stops[currentSegment+1].name;
-
+stops[currentSegment + 1].name;
+ 
 document.getElementById(
 "progress"
 ).innerHTML =
-
+ 
 "<b>📊 " +
 Math.round(progress*100) +
 "% av resan avklarad</b>";
-
+ 
 document.getElementById(
 "placeInfo"
 ).innerHTML =
-
+ 
 stops[currentSegment].info;
-
-function updateCountdown(){
+ 
+}
+ 
+updateTorch();
+ 
+setInterval(
+updateTorch,
+1000 * 60 * 30
+);
 
 const now =
 new Date();
