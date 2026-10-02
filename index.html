@@ -2,23 +2,22 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Test</title>
 
-="stylesheet"
+<link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-html,body{
- height:100%;
- margin:0;
+html, body {
+    margin: 0;
+    height: 100%;
 }
 
-#map{
- height:100%;
+#map {
+    height: 100%;
 }
 </style>
-</head>
 
+</head>
 <body>
 
 <div id="map"></div>
@@ -27,15 +26,18 @@ html,body{
 
 <script>
 
-var map = L.map('map').setView([59.3293,18.0686], 5);
+var map = L.map('map').setView([60.407,16.259], 6);
 
-.tileLayer(
-'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+{
+attribution: '&copy; OpenStreetMap'
+}
 ).addTo(map);
 
-L.marker([59.3293,18.0686])
+L.marker([60.407,16.259])
 .addTo(map)
-.bindPopup('Stockholm');
+.bindPopup('Västerberg');
 
 </script>
 
