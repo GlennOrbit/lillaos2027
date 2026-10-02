@@ -1,139 +1,42 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test</title>
 
-<title>n till Västerberg</title>
-
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
+html,body{
+ height:100%;
+ margin:0;
 }
 
-#map {
-    width: 100%;
-    height: 100vh;
-}
-
-.info {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    z-index: 1000;
-
-    background: rgba(255,255,255,0.95);
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.info h2 {
-    margin-top: 0;
+#map{
+ height:100%;
 }
 </style>
 </head>
 
 <body>
 
-<div class="info">
-    <h2>🔥 Facklan till Västerberg</h2>
-    <div id="countdown"></div>
-</div>
-
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.jsipt>
-const start = [37.638, 21.630];
-const end = [60.407, 16.259];
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-const map = L.map('map').setView([52, 15], 5);
+<script>
 
-L.tileLayer(
-    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-        attribution: '&copy; OpenStreetMap'
-    }
+var map = L.map('map').setView([59.3293,18.0686], 5);
+
+.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
 ).addTo(map);
 
-L.marker(start)
-  .addTo(map)
-  .bindPopup('🏛 Olympia');
+L.marker([59.3293,18.0686])
+.addTo(map)
+.bindPopup('Stockholm');
 
-L.marker(end)
-  .addTo(map)
-  .bindPopup('🏁 Västerbergs folkhögskola');
-
-const route = L.polyline(
-    [start, end],
-    {
-        color: 'red',
-        weight: 4
-    }
-).addTo(map);
-
-map.fitBounds(route.getBounds());
-
-const journeyStart = new Date("2026-10-02T00:00:00");
-const journeyEnd = new Date("2027-03-17T00:00:00");
-
-const now = new Date();
-
-let progress =
-(now - journeyStart) /
-(journeyEnd - journeyStart);
-
-progress = Math.max(0, Math.min(1, progress));
-
-const lat =
-start[0] + (end[0] - start[0]) * progress;
-
-const lng =
-start[1] + (end[1] - start[1]) * progress;
-
-const torchIcon = L.divIcon({
-    html: '<div style="font-size:32px;">🔥</div>',
-    className: '',
-    iconSize: [32,32]
-});
-
-L.marker([lat,lng], {
-    icon: torchIcon
-}).addTo(map);
-
-function updateCountdown() {
-
-    const target =
-    new Date("2027-03-17T00:00:00");
-
-    const now = new Date();
-    const diff = target - now;
-
-    const days =
-    Math.floor(diff / (1000*60*60*24));
-
-    const hours =
-    Math.floor((diff/(1000*60*60)) % 24);
-
-    const minutes =
-    Math.floor((diff/(1000*60)) % 60);
-
-    document.getElementById("countdown").innerHTML =
-        "<strong>" + days + "</strong> dagar<br>" +
-        hours + " timmar " +
-        minutes + " minuter kvar";
-}
-
-updateCountdown();
-setInterval(updateCountdown,1000);
 </script>
 
 </body>
