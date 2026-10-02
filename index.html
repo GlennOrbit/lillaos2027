@@ -4,18 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Facklan till Västerberg</title>
+<title>n till Västerberg</title>
 
 <link
   rel="stylesheet"
-  href="https://unpkg.com/leaflet@1.9.4/dist/leafletight: 100%;
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+html, body {
     margin: 0;
+    padding: 0;
+    height: 100%;
     font-family: Arial, sans-serif;
 }
 
 #map {
-    height: 100vh;
     width: 100%;
+    height: 100vh;
 }
 
 .info {
@@ -28,15 +34,10 @@
     padding: 15px;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    max-width: 300px;
 }
 
 .info h2 {
-    margin: 0 0 10px 0;
-}
-
-#countdown {
-    font-size: 1.1em;
+    margin-top: 0;
 }
 </style>
 </head>
@@ -50,20 +51,12 @@
 
 <div id="map"></div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaf
-
-<script>
-
-// Olympia
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.jsipt>
 const start = [37.638, 21.630];
-
-// Västerbergs folkhögskola
 const end = [60.407, 16.259];
 
-// Skapa kartan
 const map = L.map('map').setView([52, 15], 5);
 
-// Bakgrundskarta
 L.tileLayer(
     'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
@@ -71,16 +64,14 @@ L.tileLayer(
     }
 ).addTo(map);
 
-// Markörer
 L.marker(start)
- .addTo(map)
- .bindPopup("🏛 Olympia");
+  .addTo(map)
+  .bindPopup('🏛 Olympia');
 
 L.marker(end)
- .addTo(map)
- .bindPopup("🏁 Västerbergs folkhögskola");
+  .addTo(map)
+  .bindPopup('🏁 Västerbergs folkhögskola');
 
-// Linje mellan punkterna
 const route = L.polyline(
     [start, end],
     {
@@ -91,63 +82,49 @@ const route = L.polyline(
 
 map.fitBounds(route.getBounds());
 
-// Resans datum
 const journeyStart = new Date("2026-10-02T00:00:00");
 const journeyEnd = new Date("2027-03-17T00:00:00");
 
 const now = new Date();
 
 let progress =
-    (now - journeyStart) /
-    (journeyEnd - journeyStart);
+(now - journeyStart) /
+(journeyEnd - journeyStart);
 
 progress = Math.max(0, Math.min(1, progress));
 
-// Facklans position
 const lat =
-    start[0] + (end[0] - start[0]) * progress;
+start[0] + (end[0] - start[0]) * progress;
 
 const lng =
-    start[1] + (end[1] - start[1]) * progress;
+start[1] + (end[1] - start[1]) * progress;
 
-// Fackla
 const torchIcon = L.divIcon({
     html: '<div style="font-size:32px;">🔥</div>',
     className: '',
-    iconSize: [32, 32]
+    iconSize: [32,32]
 });
 
-L.marker([lat, lng], {
+L.marker([lat,lng], {
     icon: torchIcon
 }).addTo(map);
 
-// Nedräkning
 function updateCountdown() {
 
     const target =
-        new Date("2027-03-17T00:00:00");
+    new Date("2027-03-17T00:00:00");
 
     const now = new Date();
     const diff = target - now;
 
-    if (diff <= 0) {
-        document.getElementById("countdown").innerHTML =
-            "🎉 Lilla OS har startat!";
-        return;
-    }
-
     const days =
-        Math.floor(diff / (1000 * 60 * 60 * 24));
+    Math.floor(diff / (1000*60*60*24));
 
     const hours =
-        Math.floor(
-            (diff / (1000 * 60 * 60)) % 24
-        );
+    Math.floor((diff/(1000*60*60)) % 24);
 
     const minutes =
-        Math.floor(
-            (diff / (1000 * 60)) % 60
-        );
+    Math.floor((diff/(1000*60)) % 60);
 
     document.getElementById("countdown").innerHTML =
         "<strong>" + days + "</strong> dagar<br>" +
@@ -156,8 +133,7 @@ function updateCountdown() {
 }
 
 updateCountdown();
-setInterval(updateCountdown, 1000);
-
+setInterval(updateCountdown,1000);
 </script>
 
 </body>
