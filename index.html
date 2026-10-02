@@ -1,93 +1,239 @@
 <!DOCTYPE html>
-<html>
+<html lang="sv">
+
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Bildningsfacklan till Västerberg</title>
 
 <link rel="stylesheet"
 href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<style>
-html, body {
-    margin: 0;
-    height: 100%;
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"/>
+
+<;
+    padding:0;
+    height:100%;
+    font-family:Arial,sans-serif;
 }
 
-#map {
-    height: 100%;
+#map{
+    height:100vh;
 }
+
+.info{
+    position:absolute;
+    top:15px;
+    left:15px;
+
+    z-index:1000;
+
+    background:white;
+    padding:15px;
+
+    border-radius:12px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+
+.info h2{
+    margin:0;
+}
+
 </style>
 
 </head>
+
 <body>
+
+<div class="info">
+    <h2>🔥 Bildningsfacklan till Västerberg</h2>
+</div>
 
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+<script src="https://unpkg.com/leaflet-routing-machineleaflet-routing-machine.jsscript>
+
 <script>
 
+// Platser
+
 const stops = [
-    {name:"🏛 Olympia", lat:37.638, lng:21.630},
-    {name:"🏛 Aten", lat:37.9838, lng:23.7275},
-    {name:"📚 Alexandria", lat:31.2001, lng:29.9187},
-    {name:"🏛 Rom", lat:41.9028, lng:12.4964},
-    {name:"🎨 Florens", lat:43.7696, lng:11.2558},
-    {name:"📖 Wittenberg", lat:51.8661, lng:12.6483},
-    {name:"✍️ Weimar", lat:50.9795, lng:11.3235},
-    {name:"💡 Paris", lat:48.8566, lng:2.3522},
-    {name:"🤝 Genève", lat:46.2044, lng:6.1432},
-    {name:"🎓 Köpenhamn", lat:55.6761, lng:12.5683},
-    {name:"📚 Forsa folkhögskola", lat:61.730, lng:16.960},
-    {name:"📚 Bollnäs folkhögskola", lat:61.349, lng:16.394},
-    {name:"🏁 Västerbergs folkhögskola", lat:60.407, lng:16.259}
+
+{
+name:"🏛 Olympia",
+lat:37.638,
+lng:21.630
+},
+
+{
+name:"🏛 Aten",
+lat:37.9838,
+lng:23.7275
+},
+
+{
+name:"🏛 Rom",
+lat:41.9028,
+lng:12.4964
+},
+
+{
+name:"🎨 Florens",
+lat:43.7696,
+lng:11.2558
+},
+
+{
+name:"📖 Wittenberg",
+lat:51.8661,
+lng:12.6483
+},
+
+{
+name:"✍️ Weimar",
+lat:50.9795,
+lng:11.3235
+},
+
+{
+name:"💡 Paris",
+lat:48.8566,
+lng:2.3522
+},
+
+{
+name:"🤝 Genève",
+lat:46.2044,
+lng:6.1432
+},
+
+{
+name:"🎓 Köpenhamn",
+lat:55.6761,
+lng:12.5683
+},
+
+{
+name:"📚 Forsa folkhögskola",
+lat:61.730,
+lng:16.960
+},
+
+{
+name:"📚 Bollnäs folkhögskola",
+lat:61.349,
+lng:16.394
+},
+
+{
+name:"🏁 Västerbergs folkhögskola",
+lat:60.407,
+lng:16.259
+}
+
 ];
 
-// Skapa karta
+// Skapa kartan
+
 var map = L.map('map');
 
-// Bakgrundskarta
+// Bakgrund
+
 L.tileLayer(
 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 {
- attribution:'&copy; OpenStreetMap'
+attribution:'&copy; OpenStreetMap'
 }
 ).addTo(map);
 
 // Markörer
+
 stops.forEach(function(stop){
-    L.marker([stop.lat, stop.lng])
-        .addTo(map)
-        .bindPopup(stop.name);
+
+L.marker([stop.lat,stop.lng])
+.addTo(map)
+.bindPopup(stop.name);
+
 });
 
-// Koordinater till rutten
-const routeCoordinates = stops.map(
-    stop => [stop.lat, stop.lng]
-);
+// Fackelikon
 
-// Rita rutten
-const route = L.polyline(
-    routeCoordinates,
-    {
-        color: 'red',
-        weight: 4
-    }
-).addTo(map);
-
-// Anpassa zoom
-map.fitBounds(route.getBounds());
-
-// Fackla vid start
 const torchIcon = L.divIcon({
-    html:'<div style="font-size:32px">🔥</div>',
-    className:'',
-    iconSize:[32,32]
+html:'<div style="font-size:34px">🔥</div>',
+className:'',
+iconSize:[34,34]
 });
+
+// Fackla i Olympia
 
 L.marker(
-    [stops[0].lat, stops[0].lng],
-    {icon:torchIcon}
+[
+stops[0].lat,
+stops[0].lng
+],
+{
+icon:torchIcon
+}
 ).addTo(map);
+
+// Waypoints
+
+const waypoints = stops.map(stop =>
+L.latLng(stop.lat,stop.lng)
+);
+
+// Routing
+
+const routingControl =
+L.Routing.control({
+
+waypoints: waypoints,
+
+show:false,
+
+addWaypoints:false,
+
+routeWhileDragging:false,
+
+draggableWaypoints:false,
+
+fitSelectedRoutes:true,
+
+lineOptions:{
+styles:[
+{
+color:'red',
+weight:5,
+opacity:0.8
+}
+]
+},
+
+createMarker:function(){
+return null;
+}
+
+}).addTo(map);
+
+// Dölj instruktioner
+
+setTimeout(function(){
+
+const container =
+document.querySelector(
+'.leaflet-routing-container'
+);
+
+if(container){
+container.style.display='none';
+}
+
+},1000);
 
 </script>
 
