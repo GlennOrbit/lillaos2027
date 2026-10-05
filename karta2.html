@@ -392,22 +392,29 @@ paddingTopLeft: [480, 50],
 paddingBottomRight: [50, 50]
 });
 
-L.Routing.control({
- 
-waypoints: stops.map(stop =>
-L.latLng(stop.lat, stop.lng)
-),
- 
-addWaypoints: false,
- 
-draggableWaypoints: false,
- 
-routeWhileDragging: false,
- 
-show: false
- 
+const routingControl = L.Routing.control({
+
+    waypoints: stops.map(stop =>
+        L.latLng(stop.lat, stop.lng)
+    ),
+
+    addWaypoints: false,
+    draggableWaypoints: false,
+    routeWhileDragging: false,
+    show: false
+
 }).addTo(map);
 
+routingControl.on('routesfound', function(e){
+
+    routeCoordinates =
+        e.routes[0].coordinates;
+
+    updateTorch();
+
+});
+
+let routeCoordinates = [];
 let torchMarker;
 let passedLine;
 let remainingLine;
@@ -454,23 +461,21 @@ stops[i].lng
  
 }
  
-const start =
-stops[currentSegment];
- 
-const end =
-stops[currentSegment + 1];
- 
+if(routeCoordinates.length === 0){
+    return;
+}
+
+const routeIndex =
+Math.floor(
+    progress *
+    (routeCoordinates.length - 1)
+);
+
 const torchLat =
-start.lat +
-(end.lat-start.lat)
-*
-segmentProgress;
- 
+routeCoordinates[routeIndex].lat;
+
 const torchLng =
-start.lng +
-(end.lng-start.lng)
-*
-segmentProgress;
+routeCoordinates[routeIndex].lng;
  
 passedPoints.push([
 torchLat,
