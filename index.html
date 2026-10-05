@@ -84,6 +84,27 @@ background:#ff8533;
         font-size:1rem;
         margin-top:5px;
     }
+
+ .qr-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.qr-container img {
+  width: 140px;
+  height: 140px;
+  background: white;
+  padding: 8px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.qr-container p {
+  margin-top: 8px;
+  color: white;
+  font-size: 0.9rem;
+}
+
 </style>
 </head>
 <body>
@@ -118,6 +139,10 @@ background:#ff8533;
  <!-- KNAPP TILL KARTAN -->
 
 <a href="karta.html" class="map-button"> 🔥 Följ folkbildningsfacklan </a>
+
+ <div class="qr-container">
+  <img src="images/qrkarta.png" alt="att följa facklan</p>
+</div>
  
 <script>
 const targetDate = new Date("2027-03-17T09:00:00");
