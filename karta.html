@@ -500,7 +500,7 @@ fetch("data/folkbildning.json")
 
     const item =
     weeks.find(
-        x => x.vecka === currentWeek
+        x => Number(x.vecka) === currentWeek
     ) || weeks[0];
 
     document.getElementById("dailyLearning").innerHTML =
