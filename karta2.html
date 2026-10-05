@@ -425,11 +425,10 @@ let torchMarker;
 let passedLine;
 let remainingLine;
  
-const torchIcon =
-L.divIcon({
-html:'<div style="font-size:38px">🔥</div>',
-className:'',
-iconSize:[38,38]
+const torchIcon = L.icon({
+    iconUrl: 'images/fackelbarare.png',
+    iconSize: [48, 48],
+    iconAnchor: [24, 24]
 });
  
 function updateTorch(){
