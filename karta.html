@@ -503,31 +503,28 @@ fetch("data/folkbildning.json")
         x => Number(x.vecka) === currentWeek
     ) || weeks[0];
 
-document.getElementById("dailyLearning").innerHTML =
+document.getElementById("dailyLearning").innerHTML = `
+    <h3>📖 Veckans folkbildning</h3>
 
-"<h3>📖 Veckans folkbildning</h3>" +
+    <h4>${item.titel}</h4>
 
-"<h4>" +
-item.titel +
-"</h4>" +
+    <p>${item.kortIntro}</p>
 
-"<p>" +
-item.kortIntro +
-"</p>" +
+    <p>
+        <b>💭 Fundera:</b><br>
+        ${item.reflektionsfraga}
+    </p>
 
-"<p><b>💭 Fundera:</b><br>" +
-item.reflektionsfraga +
-"</p>" +
+    <p style="margin-top:15px">
+        <a
+            href="artikel.html?vecka=${item.vecka}"
+            style="font-weight:bold;color:#0066cc;"
+        >
+            👉 Läs vidare
+        </a>
+    </p>
+`;
 
-"<p style='margin-top:15px'>" +
-
-"<a href='artikel.html?vecka=" +
-item.vecka +
-"' style='font-weight:bold;color:#0066cc;'>" +
-"👉 Läs vidare" +
-"</a>" +
-
-"</p>";
 
 
 })
