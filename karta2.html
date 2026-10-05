@@ -405,6 +405,8 @@ const routingControl = L.Routing.control({
 
 }).addTo(map);
 
+
+let routeCoordinates = [];    
 routingControl.on('routesfound', function(e){
 
     routeCoordinates =
@@ -414,7 +416,6 @@ routingControl.on('routesfound', function(e){
 
 });
 
-let routeCoordinates = [];
 let torchMarker;
 let passedLine;
 let remainingLine;
@@ -427,139 +428,126 @@ iconSize:[38,38]
 });
  
 function updateTorch(){
- 
-const now = new Date();
- 
-let progress =
-(now - startDate) /
-(endDate - startDate);
- 
-progress =
-Math.max(0, Math.min(1, progress));
- 
-const totalSegments =
-stops.length - 1;
- 
-const currentSegment =
-Math.min(
-Math.floor(progress * totalSegments),
-totalSegments - 1
-);
- 
-const segmentProgress =
-(progress * totalSegments)
-- currentSegment;
- 
-const passedPoints =
-routeCoordinates
-    .slice(0, routeIndex + 1)
-    .map(point => [point.lat, point.lng]);
- 
-}
- 
-if(routeCoordinates.length === 0){
-    return;
-}
 
-const routeIndex =
-Math.floor(
-    progress *
-    (routeCoordinates.length - 1)
-);
+    const now = new Date();
 
-const torchLat =
-routeCoordinates[routeIndex].lat;
+    let progress =
+    (now - startDate) /
+    (endDate - startDate);
 
-const torchLng =
-routeCoordinates[routeIndex].lng;
- 
-passedPoints.push([
-torchLat,
-torchLng
-]);
- 
-const remaining =
-routeCoordinates
-    .slice(routeIndex)
-    .map(point => [point.lat, point.lng]);
- 
-if(!torchMarker){
- 
-torchMarker =
-L.marker(
-[torchLat,torchLng],
-{
-icon:torchIcon
-}
-).addTo(map);
- 
-}else{
- 
-torchMarker.setLatLng([
-torchLat,
-torchLng
-]);
- 
-}
- 
-if(passedLine){
- 
-map.removeLayer(
-passedLine
-);
- 
-}
- 
-if(remainingLine){
- 
-map.removeLayer(
-remainingLine
-);
- 
-}
- 
-passedLine =
-L.polyline(
-passedPoints,
-{
-color:'green',
-weight:6
-}
-).addTo(map);
- 
-remainingLine =
-L.polyline(
-remaining,
-{
-color:'red',
-weight:4,
-dashArray:'10,10'
-}
-).addTo(map);
- 
-document.getElementById(
-"nextPlace"
-).innerHTML =
- 
-"<b>🏃 På väg mot</b><br>" +
-stops[currentSegment + 1].name;
- 
-document.getElementById(
-"progress"
-).innerHTML =
- 
-"<b>📊 " +
-Math.round(progress*100) +
-"% av resan avklarad</b>";
- 
-document.getElementById(
-"placeInfo"
-).innerHTML =
- 
-stops[currentSegment+1].info;
+    progress =
+    Math.max(0, Math.min(1, progress));
 
+    const totalSegments =
+    stops.length - 1;
 
-    
+    const currentSegment =
+    Math.min(
+        Math.floor(progress * totalSegments),
+        totalSegments - 1
+    );
+
+    if(routeCoordinates.length === 0){
+        return;
+    }
+
+    const routeIndex =
+    Math.floor(
+        progress *
+        (routeCoordinates.length - 1)
+    );
+
+    const torchLat =
+    routeCoordinates[routeIndex].lat;
+
+    const torchLng =
+    routeCoordinates[routeIndex].lng;
+
+    const passedPoints =
+    routeCoordinates
+        .slice(0, routeIndex + 1)
+        .map(point => [point.lat, point.lng]);
+
+    const remaining =
+    routeCoordinates
+        .slice(routeIndex)
+        .map(point => [point.lat, point.lng]);
+
+    if(!torchMarker){
+
+        torchMarker =
+        L.marker(
+            [torchLat, torchLng],
+            {
+                icon: torchIcon
+            }
+        ).addTo(map);
+
+    }else{
+
+        torchMarker.setLatLng([
+            torchLat,
+            torchLng
+        ]);
+
+    }
+
+    if(passedLine){
+
+        map.removeLayer(
+            passedLine
+        );
+
+    }
+
+    if(remainingLine){
+
+        map.removeLayer(
+            remainingLine
+        );
+
+    }
+
+    passedLine =
+    L.polyline(
+        passedPoints,
+        {
+            color:'green',
+            weight:6
+        }
+    ).addTo(map);
+
+    remainingLine =
+    L.polyline(
+        remaining,
+        {
+            color:'red',
+            weight:4,
+            dashArray:'10,10'
+        }
+    ).addTo(map);
+
+    document.getElementById(
+        "nextPlace"
+    ).innerHTML =
+
+    "<b>🏃 På väg mot</b><br>" +
+    stops[currentSegment + 1].name;
+
+    document.getElementById(
+        "progress"
+    ).innerHTML =
+
+    "<b>📊 " +
+    Math.round(progress * 100) +
+    "% av resan avklarad</b>";
+
+    document.getElementById(
+        "placeInfo"
+    ).innerHTML =
+
+    stops[currentSegment + 1].info;
+
 }
 
 function updateCountdown() {
