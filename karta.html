@@ -490,6 +490,8 @@ fetch("data/folkbildning.json")
 .then(response => response.json())
 .then(data => {
 
+    const weeks = data.folkbildningsfacklan;
+
     const currentWeek =
     Math.floor(
         (new Date() - startDate) /
@@ -497,9 +499,36 @@ fetch("data/folkbildning.json")
     ) + 1;
 
     const item =
-    data.find(
+    weeks.find(
         x => x.vecka === currentWeek
-    ) || data[0];
+    ) || weeks[0];
+
+    document.getElementById("dailyLearning").innerHTML =
+
+    "<h3>📖 Veckans folkbildning</h3>" +
+
+    "<h4>" +
+    item.titel +
+    "</h4>" +
+
+    "<p>" +
+    item.kortIntro +
+    "</p>" +
+
+    "<p><b>💭 Fundera:</b><br>" +
+    item.reflektionsfraga +
+    "</p>";
+
+})
+.catch(error => {
+
+    console.error(error);
+
+    document.getElementById(
+        "dailyLearning"
+    ).innerHTML =
+    "<h3>📖 Veckans folkbildning</h3><p>Kunde inte ladda innehållet.</p>";
+});
 
     document.getElementById(
         "dailyLearning"
@@ -512,37 +541,14 @@ fetch("data/folkbildning.json")
     "</h4>" +
 
     "<p>" +
-    item.kortText +
+    item.kortIntro +
     "</p>" +
 
     "<a href='" +
     item.lasMerUrl +
     "'>";
 
-});const dayNumber =
-Math.floor(
-(new Date() - startDate) /
-(1000 * 60 * 60 * 24)
-);
 
-const todaysItem =
-dailyLearning[
-dayNumber % dailyLearning.length
-];
-
-document.getElementById(
-"dailyLearning"
-).innerHTML =
-
-"<h3>📖 Veckans folkbildning</h3>" +
-
-"<h4>" +
-todaysItem.title +
-"</h4>" +
-
-"<p>" +
-todaysItem.content +
-"</p>";
     
 </script>
 
