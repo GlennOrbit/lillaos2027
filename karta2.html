@@ -401,10 +401,15 @@ const routingControl = L.Routing.control({
     addWaypoints: false,
     draggableWaypoints: false,
     routeWhileDragging: false,
-    show: false
+    show: false,
+
+    lineOptions: {
+        styles: [
+            {opacity: 0}
+        ]
+    }
 
 }).addTo(map);
-
 
 let routeCoordinates = [];    
 routingControl.on('routesfound', function(e){
