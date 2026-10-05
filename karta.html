@@ -385,7 +385,10 @@ L.marker([stop.lat,stop.lng])
 const allPoints =
 stops.map(p => [p.lat,p.lng]);
 
-map.fitBounds(allPoints);
+map.fitBounds(allPoints, {
+paddingTopLeft: [480, 50],
+paddingBottomRight: [50, 50]
+}););
 
 let torchMarker;
 let passedLine;
