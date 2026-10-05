@@ -11,66 +11,245 @@ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 
-html,body{
+html,
+body{
     margin:0;
     height:100%;
     font-family:Arial,sans-serif;
 }
 
+/* KARTAN */
+
 #map{
     height:100vh;
+    width:100%;
 }
 
-.info{
+
+/* PANELEN */
+
+.panel-container{
     position:absolute;
-    top:15px;
-    left:15px;
+    top:20px;
+    left:20px;
     z-index:1000;
 
-    background:white;
-    padding:15px;
-    border-radius:12px;
+    display:flex;
+    flex-direction:column;
 
-    max-width:320px;
+    gap:15px;
 
-    box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    transition:transform 0.3s ease;
 }
+
+
+/* INFORMATIONSRUTOR */
+
+.info,
+.learning-box{
+    background:white;
+
+    padding:20px;
+
+    border-radius:14px;
+
+    width:360px;
+
+    box-sizing:border-box;
+
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+
+    font-size:17px;
+    line-height:1.5;
+}
+
+
+/* RUBRIKER */
 
 h2{
     margin-top:0;
+    margin-bottom:15px;
+
+    font-size:28px;
 }
 
-.place{
+.learning-box h3{
+    margin-top:0;
+    margin-bottom:12px;
+
+    font-size:23px;
+}
+
+.learning-box h4{
+    margin-top:0;
+    margin-bottom:12px;
+
+    font-size:20px;
+}
+
+
+/* MENYKNAPP */
+
+#menuButton{
+    display:none;
+
+    position:absolute;
+
+    top:15px;
+    right:15px;
+
+    z-index:2000;
+
+    background:white;
+
+    border:none;
+    border-radius:10px;
+
+    padding:12px 18px;
+
+    font-size:18px;
     font-weight:bold;
-    color:darkgreen;
+
+    box-shadow:0 3px 10px rgba(0,0,0,0.3);
+
+    cursor:pointer;
+}
+
+
+/* STOR SKÄRM */
+
+@media (min-width:1200px){
+
+    .panel-container{
+        top:30px;
+        left:30px;
+        gap:20px;
+    }
+
+    .info,
+    .learning-box{
+        width:440px;
+
+        padding:28px;
+
+        font-size:20px;
+
+        border-radius:18px;
+    }
+
+    h2{
+        font-size:34px;
+    }
+
+    .learning-box h3{
+        font-size:28px;
+    }
+
+    .learning-box h4{
+        font-size:24px;
+    }
+}
+
+
+/* MOBIL */
+
+@media (max-width:600px){
+
+    /* Visa menyknappen */
+
+    #menuButton{
+        display:block;
+    }
+
+
+    /* Panelen ligger ovanpå kartan */
+
+    .panel-container{
+        top:70px;
+        left:10px;
+        right:10px;
+
+        gap:10px;
+
+        transform:translateX(-120%);
+
+        max-height:calc(100vh - 85px);
+
+        overflow-y:auto;
+    }
+
+
+    /* När menyn är öppen */
+
+    .panel-container.open{
+        transform:translateX(0);
+    }
+
+
+    /* Rutorna */
+
+    .info,
+    .learning-box{
+        width:100%;
+
+        padding:18px;
+
+        font-size:16px;
+
+        border-radius:12px;
+    }
+
+
+    h2{
+        font-size:25px;
+    }
+
+    .learning-box h3{
+        font-size:21px;
+    }
+
+    .learning-box h4{
+        font-size:18px;
+    }
 }
 
 </style>
 
+
 </head>
-<body>
+
+    <body>
+<button id="menuButton" onclick="toggleMenu()">
+    ☰ Meny
+</button>
+
+<div class="panel-container"id="panel">
 
 <div class="info">
 
 <h2>🔥 Folkbildningsfacklan</h2>
 
-<div id="currentPlace"></div>
+<div id="countdown"></div>
 
 <br>
 
 <div id="nextPlace"></div>
 
 <br>
+    
+<div id="placeInfo"></div>
+    
+<br>
 
 <div id="progress"></div>
 
-<br>
+</div>
 
-<div id="placeInfo"></div>
+<div class="learning-box">
 
-<br>
+<div id="dailyLearning"></div>
 
-<div id="countdown"></div>
+</div>
 
 </div>
 
@@ -172,7 +351,7 @@ const startDate =
 new Date("2026-10-02T00:00:00");
 
 const endDate =
-new Date("2027-03-17T08:00:00");
+new Date("2027-03-17T09:00:00");
 
 const now = new Date();
 
@@ -208,67 +387,131 @@ stops.map(p => [p.lat,p.lng]);
 
 map.fitBounds(allPoints);
 
-const totalSegments =
-stops.length - 1;
-
-const currentSegment =
-Math.min(
-Math.floor(progress * totalSegments),
-totalSegments - 1
-);
-
-const segmentProgress =
-(progress * totalSegments)
-- currentSegment;
-
-let passedPoints = [];
-
-for(let i=0;i<=currentSegment;i++){
-
-passedPoints.push([
-stops[i].lat,
-stops[i].lng
-]);
-
-}
-
-const start =
-stops[currentSegment];
-
-const end =
-stops[currentSegment+1];
-
-const torchLat =
-start.lat +
-(end.lat-start.lat)
-*
-segmentProgress;
-
-const torchLng =
-start.lng +
-(end.lng-start.lng)
-*
-segmentProgress;
-
-passedPoints.push([
-torchLat,
-torchLng
-]);
-
+let torchMarker;
+let passedLine;
+let remainingLine;
+ 
 const torchIcon =
 L.divIcon({
 html:'<div style="font-size:38px">🔥</div>',
 className:'',
 iconSize:[38,38]
 });
-
+ 
+function updateTorch(){
+ 
+const now = new Date();
+ 
+let progress =
+(now - startDate) /
+(endDate - startDate);
+ 
+progress =
+Math.max(0, Math.min(1, progress));
+ 
+const totalSegments =
+stops.length - 1;
+ 
+const currentSegment =
+Math.min(
+Math.floor(progress * totalSegments),
+totalSegments - 1
+);
+ 
+const segmentProgress =
+(progress * totalSegments)
+- currentSegment;
+ 
+let passedPoints = [];
+ 
+for(let i=0;i<=currentSegment;i++){
+ 
+passedPoints.push([
+stops[i].lat,
+stops[i].lng
+]);
+ 
+}
+ 
+const start =
+stops[currentSegment];
+ 
+const end =
+stops[currentSegment + 1];
+ 
+const torchLat =
+start.lat +
+(end.lat-start.lat)
+*
+segmentProgress;
+ 
+const torchLng =
+start.lng +
+(end.lng-start.lng)
+*
+segmentProgress;
+ 
+passedPoints.push([
+torchLat,
+torchLng
+]);
+ 
+let remaining = [];
+ 
+remaining.push([
+torchLat,
+torchLng
+]);
+ 
+for(
+let i=currentSegment+1;
+i<stops.length;
+i++
+){
+ 
+remaining.push([
+stops[i].lat,
+stops[i].lng
+]);
+ 
+}
+ 
+if(!torchMarker){
+ 
+torchMarker =
 L.marker(
 [torchLat,torchLng],
 {
 icon:torchIcon
 }
 ).addTo(map);
-
+ 
+}else{
+ 
+torchMarker.setLatLng([
+torchLat,
+torchLng
+]);
+ 
+}
+ 
+if(passedLine){
+ 
+map.removeLayer(
+passedLine
+);
+ 
+}
+ 
+if(remainingLine){
+ 
+map.removeLayer(
+remainingLine
+);
+ 
+}
+ 
+passedLine =
 L.polyline(
 passedPoints,
 {
@@ -276,27 +519,8 @@ color:'green',
 weight:6
 }
 ).addTo(map);
-
-let remaining = [];
-
-remaining.push([
-torchLat,
-torchLng
-]);
-
-for(
-let i=currentSegment+1;
-i<stops.length;
-i++
-){
-
-remaining.push([
-stops[i].lat,
-stops[i].lng
-]);
-
-}
-
+ 
+remainingLine =
 L.polyline(
 remaining,
 {
@@ -305,64 +529,74 @@ weight:4,
 dashArray:'10,10'
 }
 ).addTo(map);
-
-document.getElementById(
-"currentPlace"
-).innerHTML =
-
-"<b>📍 Senast passerad plats</b><br>" +
-stops[currentSegment].name;
-
+ 
 document.getElementById(
 "nextPlace"
 ).innerHTML =
-
+ 
 "<b>🏃 På väg mot</b><br>" +
-stops[currentSegment+1].name;
-
+stops[currentSegment + 1].name;
+ 
 document.getElementById(
 "progress"
 ).innerHTML =
-
+ 
 "<b>📊 " +
 Math.round(progress*100) +
 "% av resan avklarad</b>";
-
+ 
 document.getElementById(
 "placeInfo"
 ).innerHTML =
+ 
+stops[currentSegment+1].info;
 
-stops[currentSegment].info;
 
-function updateCountdown(){
-
-const now =
-new Date();
-
-const diff =
-endDate - now;
-
-const days =
-Math.floor(
-diff/(1000*60*60*24)
-);
-
-const hours =
-Math.floor(
-(diff/(1000*60*60))%24
-);
-
-document.getElementById(
-"countdown"
-).innerHTML =
-
-"⏳ " +
-days +
-" dagar " +
-hours +
-" timmar kvar";
-
+    
 }
+
+function updateCountdown() {
+
+    const now = new Date();
+
+    const diff = endDate - now;
+
+    if (diff <= 0) {
+        document.getElementById("countdown").innerHTML =
+        "🏁 Folkbildningsfacklan har nått målet!";
+        return;
+    }
+
+    const days =
+    Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const hours =
+    Math.floor((diff / (1000 * 60 * 60)) % 24);
+
+    const minutes =
+    Math.floor((diff / (1000 * 60)) % 60);
+
+    const seconds =
+    Math.floor((diff / 1000) % 60);
+
+    document.getElementById("countdown").innerHTML =
+    "⏳ " +
+    days +
+    " dagar " +
+    hours +
+    " timmar " +
+    minutes +
+    " minuter " +
+    seconds +
+    " sekunder kvar";
+}
+    
+updateTorch();
+ 
+setInterval(
+updateTorch,
+1000 * 60 * 30
+);
 
 updateCountdown();
 
@@ -371,6 +605,81 @@ updateCountdown,
 1000
 );
 
+fetch("data/folkbildning.json")
+.then(response => response.json())
+.then(data => {
+
+    const weeks = data.folkbildningsfacklan;
+
+    const currentWeek =
+    Math.floor(
+        (new Date() - startDate) /
+        (1000 * 60 * 60 * 24 * 7)
+    ) + 1;
+
+    const item =
+    weeks.find(
+        x => Number(x.vecka) === currentWeek
+    ) || weeks[0];
+
+document.getElementById("dailyLearning").innerHTML = `
+    <h3>📖 Veckans folkbildning</h3>
+
+    <h4>${item.titel}</h4>
+
+    <p>${item.kortIntro}</p>
+
+    <p>
+        <b>💭 Fundera:</b><br>
+        ${item.reflektionsfraga}
+    </p>
+
+    <p style="margin-top:15px">
+        <a
+            href="artikel.html?vecka=${item.vecka}"
+            style="font-weight:bold;color:#0066cc;"
+        >
+            👉 Läs vidare
+        </a>
+    </p>
+`;
+
+
+
+})
+.catch(error => {
+
+    console.error(error);
+
+    document.getElementById(
+        "dailyLearning"
+    ).innerHTML =
+    "<h3>📖 Veckans folkbildning</h3><p>Kunde inte ladda innehållet.</p>";
+});
+
+   function toggleMenu(){
+
+    const panel =
+        document.getElementById("panel");
+
+    const button =
+        document.getElementById("menuButton");
+
+    panel.classList.toggle("open");
+
+    if(panel.classList.contains("open")){
+
+        button.innerHTML = "✕ Stäng";
+
+    }else{
+
+        button.innerHTML = "☰ Meny";
+
+    }
+
+}
+ 
+    
 </script>
 
 </body>
