@@ -424,7 +424,8 @@ routingControl.on('routesfound', function(e){
 let torchMarker;
 let passedLine;
 let remainingLine;
- 
+let firstZoom = true;
+    
 const torchIcon = L.icon({
     iconUrl: 'images/fackelbarare.png',
     iconSize: [48, 48],
@@ -477,24 +478,42 @@ function updateTorch(){
         .slice(routeIndex)
         .map(point => [point.lat, point.lng]);
 
-    if(!torchMarker){
+if(!torchMarker){
 
-        torchMarker =
-        L.marker(
-            [torchLat, torchLng],
-            {
-                icon: torchIcon
-            }
-        ).addTo(map);
+    torchMarker =
+    L.marker(
+        [torchLat, torchLng],
+        {
+            icon: torchIcon
+        }
+    ).addTo(map);
 
-    }else{
+    if(firstZoom){
 
-        torchMarker.setLatLng([
-            torchLat,
-            torchLng
-        ]);
+        firstZoom = false;
+
+        setTimeout(() => {
+
+            map.flyTo(
+                [torchLat, torchLng],
+                7,
+                {
+                    duration: 5
+                }
+            );
+
+        }, 3000);
 
     }
+
+}else{
+
+    torchMarker.setLatLng([
+        torchLat,
+        torchLng
+    ]);
+
+}
 
     if(passedLine){
 
