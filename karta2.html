@@ -450,14 +450,10 @@ const segmentProgress =
 (progress * totalSegments)
 - currentSegment;
  
-let passedPoints = [];
- 
-for(let i=0;i<=currentSegment;i++){
- 
-passedPoints.push([
-stops[i].lat,
-stops[i].lng
-]);
+const passedPoints =
+routeCoordinates
+    .slice(0, routeIndex + 1)
+    .map(point => [point.lat, point.lng]);
  
 }
  
@@ -482,25 +478,10 @@ torchLat,
 torchLng
 ]);
  
-let remaining = [];
- 
-remaining.push([
-torchLat,
-torchLng
-]);
- 
-for(
-let i=currentSegment+1;
-i<stops.length;
-i++
-){
- 
-remaining.push([
-stops[i].lat,
-stops[i].lng
-]);
- 
-}
+const remaining =
+routeCoordinates
+    .slice(routeIndex)
+    .map(point => [point.lat, point.lng]);
  
 if(!torchMarker){
  
